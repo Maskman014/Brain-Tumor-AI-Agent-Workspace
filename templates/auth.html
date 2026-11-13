@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Create account' if mode == 'register' else 'Log in' }} &middot; Brain Tumor Detection{% endblock %}
+{% block content %}
+<section class="wrap">
+  <form class="card authcard" method="post">
+    <h1>{{ 'Create your account' if mode == 'register' else 'Welcome back' }}</h1>
+    <p class="muted">{{ 'Save your scans and track them on a personal dashboard.' if mode == 'register' else 'Log in to analyse scans and see your history.' }}</p>
+    {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+    {% if mode == 'register' %}
+    <label class="field">Full name <span class="muted">(optional)</span><input name="name" maxlength="40" autocomplete="name"></label>
+    {% endif %}
+    <label class="field">Username<input name="username" required minlength="3" maxlength="30" pattern="[A-Za-z0-9_]+" autocomplete="username" autofocus></label>
+    <label class="field">Password{% if mode == 'register' %} <span class="muted">(min 6 characters)</span>{% endif %}<input type="password" name="password" required minlength="{{ 6 if mode == 'register' else 1 }}" autocomplete="{{ 'new-password' if mode == 'register' else 'current-password' }}"></label>
+    <button class="btn block">{{ 'Sign up' if mode == 'register' else 'Log in' }}</button>
+    <p class="center muted small">
+      {% if mode == 'register' %}Already have an account? <a href="{{ url_for('login') }}">Log in</a>
+      {% else %}New here? <a href="{{ url_for('register') }}">Create an account</a>{% endif %}
+    </p>
+  </form>
+</section>
+{% endblock %}

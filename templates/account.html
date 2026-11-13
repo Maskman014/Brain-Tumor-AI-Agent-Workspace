@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Account &middot; Brain Tumor Detection{% endblock %}
+{% block content %}
+<section class="wrap">
+  <h1>Your account</h1>
+  <p class="muted">Signed in as <b>{{ user.username }}</b> &middot; member since {{ user.created|fmt }}</p>
+  <div class="grid2">
+    <form class="card" method="post">
+      <h2>Change password</h2><input type="hidden" name="action" value="password">
+      <label class="field">Current password<input type="password" name="old" required autocomplete="current-password"></label>
+      <label class="field">New password<input type="password" name="new" required minlength="6" autocomplete="new-password"></label>
+      <button class="btn">Update password</button>
+    </form>
+    <form class="card" method="post" onsubmit="return confirm('Delete ALL your scans and images? This cannot be undone.')">
+      <h2>Your data</h2><input type="hidden" name="action" value="clear">
+      <p class="muted">You have <b>{{ n }}</b> saved scan{{ '' if n == 1 else 's' }}. Images are stored on this server and only visible to you.</p>
+      <button class="btn danger" {{ 'disabled' if not n }}>Delete all my scans</button>
+    </form>
+  </div>
+</section>
+{% endblock %}

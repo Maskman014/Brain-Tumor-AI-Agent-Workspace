@@ -1,0 +1,1 @@
+Copy brain_tumor_resnet_90.pth, classes.json and metrics.json (from the Colab model_files.zip) into this folder.

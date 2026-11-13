@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Analyse &middot; Brain Tumor Detection{% endblock %}
+{% block content %}
+<section class="wrap">
+  <h1>Analyse an MRI scan</h1>
+  <p class="muted">Upload a single brain MRI slice. Results are saved to your history automatically.</p>
+  <div class="grid2" id="tool">
+    <div class="card">
+      <h2>1. Upload</h2>
+      <label class="drop" id="drop">
+        <input type="file" id="file" accept="image/png,image/jpeg" hidden>
+        <div id="dropText"><div class="icon">&#8682;</div><b>Click to upload</b> or drag &amp; drop<br><span class="muted">JPG or PNG &middot; max 8 MB</span></div>
+        <img id="preview" alt="Preview" hidden>
+      </label>
+      <label class="field">Patient name / case ID <span class="muted">(optional, shown on report)</span>
+        <input type="text" id="patient" maxlength="60" placeholder="e.g. Case 014"></label>
+      <button class="btn" id="go" disabled>Analyse scan</button>
+      <p class="err" id="err" hidden></p>
+      <ul class="tips muted small"><li>Best with an axial brain MRI slice (T1 / T2 / FLAIR).</li><li>Avoid screenshots with text, arrows or annotations.</li><li>The model can't check that an image really is a brain MRI.</li></ul>
+    </div>
+    <div class="card" id="resultCard">
+      <h2>2. Result</h2>
+      <div id="empty" class="empty muted">Your analysis will appear here.</div>
+      <div id="loading" hidden><div class="spinner"></div><p class="muted center">Analysing&hellip;</p></div>
+      <div id="result" hidden>
+        <div class="verdict" id="verdict"></div>
+        <p class="warn" id="warn" hidden>Low confidence &mdash; this result is inconclusive. Try a clearer axial MRI slice.</p>
+        <div id="bars"></div>
+        <p class="infobox" id="info"></p>
+        <div class="imgs">
+          <figure><img id="imgO" alt="Original"><figcaption>Original</figcaption></figure>
+          <figure><img id="imgH" alt="Heatmap"><figcaption>Grad-CAM attention</figcaption></figure>
+        </div>
+        <p class="muted small">The heatmap shows where the model looked &mdash; it is not a tumor outline. <span id="secs"></span></p>
+        <div class="row"><a class="btn" id="rep" target="_blank">View / print report</a><button class="btn ghost" id="again">New scan</button></div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='app.js') }}"></script>{% endblock %}

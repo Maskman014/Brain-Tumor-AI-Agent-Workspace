@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Dashboard &middot; Brain Tumor Detection{% endblock %}
+{% block content %}
+<section class="wrap">
+  <div class="rowbetween">
+    <div><h1>Hello, {{ user.name or user.username }} &#128075;</h1><p class="muted">Here's an overview of your scans.</p></div>
+    <a class="btn" href="{{ url_for('analyze') }}">+ New scan</a>
+  </div>
+  <div class="stats">
+    <div class="card stat"><b>{{ total }}</b>total scans</div>
+    <div class="card stat"><b class="bad">{{ tumor }}</b>tumor detected</div>
+    <div class="card stat"><b class="ok">{{ normal }}</b>no tumor</div>
+    <div class="card stat"><b>{{ avg if total else '—' }}{{ '%' if total }}</b>avg. confidence{% if unc %} &middot; {{ unc }} inconclusive{% endif %}</div>
+  </div>
+  {% if not total %}
+  <div class="card center"><h2>No scans yet</h2><p class="muted">Analyse your first MRI to see charts here.</p><a class="btn" href="{{ url_for('analyze') }}">Analyse a scan</a></div>
+  {% else %}
+  <div class="grid2">
+    <div class="card">
+      <h2>Result split</h2>
+      <div class="donut" style="--p:{{ tp }}"><span>{{ total }}</span></div>
+      <p class="legend"><span><i class="dot t"></i>Tumor detected {{ tumor }}</span><span><i class="dot n"></i>No tumor {{ normal }}</span></p>
+    </div>
+    <div class="card">
+      <h2>Last 7 days</h2>
+      <div class="chart">
+        {% for s in series %}
+        <div class="col"><em>{{ s.total or '' }}</em>
+          <div class="stack" style="height:{{ s.h }}px"><i class="tu" style="flex:{{ s.tumor }}"></i><i class="no" style="flex:{{ s.normal }}"></i></div>
+          <span>{{ s.day }}</span></div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  {% if multi %}
+  <div class="card"><h2>Results by type</h2>
+    {% for t in types %}<div class="bar"><span>{{ t.label }}</span><div class="track"><i class="{{ 't' if t.tumor }}" style="width:{{ t.pct }}%"></i></div><em>{{ t.c }}</em></div>{% endfor %}
+  </div>
+  {% endif %}
+  <div class="card tablewrap">
+    <div class="rowbetween pad"><h2>Recent scans</h2><a href="{{ url_for('history') }}">View all &rarr;</a></div>
+    <table><thead><tr><th></th><th>Patient / file</th><th>Result</th><th>Confidence</th><th>Date</th><th></th></tr></thead><tbody>
+    {% for s in recent %}
+      <tr><td><img class="thumb" src="{{ s.original_url }}" alt=""></td>
+      <td>{{ s.patient or '—' }}<br><span class="muted small">{{ s.name }}</span></td>
+      <td><span class="badge {{ 't' if s.tumor else 'n' }}">{{ s.label }}</span></td>
+      <td>{{ s.confidence }}%</td><td class="small">{{ s.created }}</td>
+      <td><a href="{{ s.report_url }}" target="_blank">Report</a></td></tr>
+    {% endfor %}
+    </tbody></table>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

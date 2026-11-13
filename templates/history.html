@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}History &middot; Brain Tumor Detection{% endblock %}
+{% block content %}
+<section class="wrap">
+  <div class="rowbetween"><h1>Scan history</h1>
+    <a class="btn ghost" href="{{ url_for('history_csv') }}">&#8681; Export CSV</a></div>
+  <form class="card filters" method="get">
+    <input type="search" name="q" value="{{ q }}" placeholder="Search patient or file name&hellip;">
+    <select name="label">{% for v, t in opts %}<option value="{{ v }}" {{ 'selected' if label == v }}>{{ t }}</option>{% endfor %}</select>
+    <button class="btn">Filter</button>
+    {% if q or label %}<a class="btn ghost" href="{{ url_for('history') }}">Clear</a>{% endif %}
+  </form>
+  {% if not scans %}
+    <div class="card center"><p class="muted">{{ 'No scans match your filters.' if (q or label) else 'No scans yet.' }}</p>
+    <a class="btn" href="{{ url_for('analyze') }}">Analyse a scan</a></div>
+  {% else %}
+  <div class="card tablewrap">
+    <table>
+      <thead><tr><th></th><th>Patient / file</th><th>Result</th><th>Confidence</th><th>Date</th><th></th></tr></thead>
+      <tbody>
+      {% for s in scans %}
+        <tr id="row{{ s.id }}">
+          <td><img class="thumb" src="{{ s.original_url }}" alt="" loading="lazy"></td>
+          <td>{{ s.patient or '—' }}<br><span class="muted small">{{ s.name }}</span></td>
+          <td><span class="badge {{ 't' if s.tumor else 'n' }}">{{ s.label }}</span>{% if s.uncertain %} <span class="muted small">(inconclusive)</span>{% endif %}</td>
+          <td>{{ s.confidence }}%</td>
+          <td class="small">{{ s.created }}</td>
+          <td class="actions"><a href="{{ s.report_url }}" target="_blank">Report</a>
+            <button class="link del" data-id="{{ s.id }}">Delete</button></td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="pager">
+    {% if page > 1 %}<a class="btn ghost sm" href="{{ url_for('history', q=q, label=label, page=page-1) }}">&larr; Prev</a>{% endif %}
+    <span class="muted small">Page {{ page }} of {{ pages }} &middot; {{ total }} scan{{ '' if total == 1 else 's' }}</span>
+    {% if page < pages %}<a class="btn ghost sm" href="{{ url_for('history', q=q, label=label, page=page+1) }}">Next &rarr;</a>{% endif %}
+  </div>
+  {% endif %}
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+document.querySelectorAll('.del').forEach(b => b.onclick = async () => {
+  if (!confirm('Delete this scan permanently?')) return;
+  const r = await fetch('/api/delete/' + b.dataset.id, {method: 'POST'});
+  if (r.ok) document.getElementById('row' + b.dataset.id).remove(); else alert('Could not delete. Please log in again.');
+});
+</script>
+{% endblock %}

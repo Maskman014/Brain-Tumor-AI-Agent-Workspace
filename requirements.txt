@@ -1,0 +1,7 @@
+flask>=3.0
+torch
+torchvision
+pillow
+numpy
+waitress
+gunicorn; sys_platform != "win32"

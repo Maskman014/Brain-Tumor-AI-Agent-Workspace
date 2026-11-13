@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}About &middot; Brain Tumor Detection{% endblock %}
+{% block content %}
+<section class="wrap">
+  <h1>About the model</h1>
+  <div class="grid2">
+    <div class="card">
+      <h2>Technical details</h2>
+      <table class="kv">
+        <tr><td>Architecture</td><td>ResNet-18, ImageNet pre-trained, fine-tuned</td></tr>
+        <tr><td>Task</td><td>{{ m.names|length }}-class classification: {{ m.names|join(' / ') }}</td></tr>
+        <tr><td>Input</td><td>224 &times; 224 RGB MRI slice</td></tr>
+        <tr><td>Dataset</td><td>{{ m.total }} labelled brain MRI images (public dataset)</td></tr>
+        <tr><td>Training</td><td>{{ m.train }} images &middot; {{ m.epochs }} epochs &middot; Adam &middot; flip + rotation augmentation</td></tr>
+        <tr><td>Evaluation</td><td>{{ m.n }} unseen {{ m.test_name }} images</td></tr>
+        <tr><td>Explainability</td><td>Grad-CAM on the last convolutional block</td></tr>
+        <tr><td>Web stack</td><td>Flask &middot; SQLite &middot; PyTorch</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <h2>Performance</h2>
+      <p class="bignum">{{ m.acc }}%<span class="muted small"> accuracy on {{ m.n }} {{ m.test_name }} images</span></p>
+      <div class="scrollx"><table class="cm">
+        <tr><th>Actual &darr; / Predicted &rarr;</th>{% for n in m.names %}<th>{{ n }}</th>{% endfor %}</tr>
+        {% for row in m.cm %}{% set i = loop.index0 %}
+        <tr><th>{{ m.names[i] }}</th>{% for v in row %}<td class="{{ 'ok' if loop.index0 == i }}">{{ v }}</td>{% endfor %}</tr>
+        {% endfor %}
+      </table></div>
+      <table class="prf">
+        <tr><th>Class</th><th>Precision</th><th>Recall</th><th>F1</th><th>Images</th></tr>
+        {% for name, p, r, f, n in m.rows %}
+        <tr><td>{{ name }}</td><td>{{ "%.1f"|format(p*100) }}%</td><td>{{ "%.1f"|format(r*100) }}%</td><td>{{ "%.1f"|format(f*100) }}%</td><td>{{ n }}</td></tr>
+        {% endfor %}
+      </table>
+      <p class="muted small">Results on one dataset do not prove real-world accuracy.</p>
+    </div>
+  </div>
+  <div class="card warnbox">
+    <h2>Limitations &amp; disclaimer</h2>
+    <ul>
+      <li>Trained on public datasets only; it may not generalise to other scanners, sequences or hospitals.</li>
+      <li>It cannot tell whether an uploaded picture is actually a brain MRI.</li>
+      <li>It analyses a single 2-D slice; doctors review full 3-D studies.</li>
+      <li>This is a student project. It is <b>not</b> a medical device and gives no diagnosis.</li>
+    </ul>
+  </div>
+</section>
+{% endblock %}

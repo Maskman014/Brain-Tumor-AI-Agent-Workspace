@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero"><div class="wrap">
+  <span class="pill">ResNet-18 &middot; Grad-CAM &middot; PyTorch + Flask</span>
+  <h1>Brain Tumor Detection <span class="grad">from MRI scans.</span></h1>
+  <p class="lead">Upload a brain MRI slice and get an AI prediction with a confidence score and a heatmap showing which regions influenced the decision &mdash; all saved to your private dashboard.</p>
+  <div class="cta">
+    <a class="btn lg" href="{{ url_for('analyze') }}">Analyse an MRI</a>
+    <a class="btn lg ghost" href="{{ url_for('learn') }}">How it works</a>
+  </div>
+</div></section>
+
+<section class="wrap"><div class="stats">
+  <div class="card stat"><b>{{ m.acc }}%</b>validation accuracy</div>
+  <div class="card stat"><b>{{ m.total }}</b>MRI images in dataset</div>
+  <div class="card stat"><b>{{ m.names|length }}</b>classes detected</div>
+  <div class="card stat"><b>&lt;1s</b>typical analysis time</div>
+</div></section>
+
+<section class="wrap">
+  <h2 class="center">Everything you need in one place</h2>
+  <div class="grid3">
+    <div class="card feat"><i>&#129504;</i><h3>AI classification</h3><p class="muted">Fine-tuned ResNet-18 predicts {{ m.names|join(' / ') }} with class probabilities.</p></div>
+    <div class="card feat"><i>&#128269;</i><h3>Explainable results</h3><p class="muted">Grad-CAM heatmaps show where the model focused &mdash; no black box.</p></div>
+    <div class="card feat"><i>&#128202;</i><h3>Personal dashboard</h3><p class="muted">Track your scans, tumor/normal split and activity over the last 7 days.</p></div>
+    <div class="card feat"><i>&#128196;</i><h3>Printable reports</h3><p class="muted">Every scan gets a clean report you can print or save as PDF.</p></div>
+    <div class="card feat"><i>&#128193;</i><h3>History &amp; export</h3><p class="muted">Search, filter and export all your scans to CSV for your records.</p></div>
+    <div class="card feat"><i>&#128274;</i><h3>Private by design</h3><p class="muted">Accounts with hashed passwords; your images are only visible to you.</p></div>
+  </div>
+</section>
+
+<section class="wrap">
+  <h2 class="center">How it works</h2>
+  <div class="grid3">
+    <div class="card step"><b>1</b><h3>Upload</h3><p class="muted">Add an MRI slice (JPG/PNG). It's validated and resized to 224&times;224.</p></div>
+    <div class="card step"><b>2</b><h3>Classify</h3><p class="muted">The model outputs a probability for every class in well under a second.</p></div>
+    <div class="card step"><b>3</b><h3>Explain</h3><p class="muted">A heatmap highlights influential regions; the report is saved to your history.</p></div>
+  </div>
+</section>
+
+<section class="wrap"><div class="card banner">
+  <div><h2>Ready to try it?</h2><p class="muted">Create a free account &mdash; it takes 10 seconds.</p></div>
+  {% if user %}<a class="btn lg" href="{{ url_for('analyze') }}">Analyse a scan</a>
+  {% else %}<a class="btn lg" href="{{ url_for('register') }}">Create account</a>{% endif %}
+</div>
+<p class="center muted small">&#9888; Educational prototype. Not a medical device and not a diagnosis.</p></section>
+{% endblock %}

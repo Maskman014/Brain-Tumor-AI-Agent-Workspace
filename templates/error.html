@@ -1,0 +1,5 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="wrap center"><h1 class="big">{{ code }}</h1><p class="muted">{{ msg }}</p>
+<a class="btn" href="{{ url_for('home') }}">Back to home</a></section>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Learn &middot; Brain Tumor Detection{% endblock %}
+{% block content %}
+<section class="wrap narrow">
+  <h1>Learn: brain tumors, MRI &amp; AI</h1>
+  <p class="muted">Plain-language background for this project. This is general education, not medical advice.</p>
+
+  <div class="card prose">
+    <h2>What is a brain tumor?</h2>
+    <p>A brain tumor is an abnormal growth of cells in or around the brain. Tumors can be <b>benign</b> (non-cancerous) or <b>malignant</b> (cancerous), and may start in the brain (primary) or spread from another part of the body (metastatic). Only a doctor &mdash; using imaging and often a tissue sample &mdash; can say what a growth actually is.</p>
+    <h2>What does MRI show?</h2>
+    <p>Magnetic resonance imaging (MRI) uses magnets and radio waves to make detailed pictures of soft tissue. Radiologists review many slices and several sequences (such as T1, T2 and FLAIR), often with contrast dye. This app looks at <b>one 2-D slice only</b>, far less than a specialist sees.</p>
+    <h2>How does this AI work?</h2>
+    <ol>
+      <li>The image is resized to 224&times;224 pixels and normalised.</li>
+      <li>A <b>ResNet-18</b> neural network, pre-trained on millions of everyday photos and then fine-tuned on {{ m.total }} brain MRI images, outputs a probability for each class: {{ m.names|join(', ') }}.</li>
+      <li><b>Grad-CAM</b> measures which parts of the image pushed the prediction most and paints them as a heatmap (red = more influence).</li>
+    </ol>
+    {% if m.names|length > 2 %}<h2>Tumor types this model reports</h2>
+    <ul>{% for n in m.names if n in info and n != 'No tumor' %}<li><b>{{ n }}</b> &mdash; {{ info[n] }}</li>{% endfor %}</ul>{% endif %}
+    <h2>Symptoms worth discussing with a doctor</h2>
+    <p>Persistent or worsening headaches, seizures, changes in vision, hearing or speech, weakness or numbness, balance problems, memory or personality changes, or unexplained repeated vomiting. These have many causes other than tumors &mdash; but they deserve a proper medical check. If symptoms are sudden or severe, seek urgent care.</p>
+  </div>
+
+  <h2>Frequently asked questions</h2>
+  <div class="faq">
+    <details><summary>Is this a diagnosis?</summary><p>No. Brain Tumor Detection is a student learning project. It is not a medical device, has not been clinically validated, and must never replace a radiologist or doctor.</p></details>
+    <details><summary>What does the confidence score mean?</summary><p>It is the probability the model assigns to its own answer. Models can be confidently wrong, especially on images unlike their training data, so treat it as a hint, not a guarantee. Below 75% the app marks the result as inconclusive.</p></details>
+    <details><summary>Can it tell the tumor type, size or location?</summary><p>{% if m.names|length > 2 %}It suggests one of: {{ m.names|join(', ') }}. It cannot measure size or give an exact location; the heatmap shows what influenced the model, not the tumor boundary.{% else %}No. It only predicts whether a tumor is likely present. The heatmap shows what influenced the model, not the tumor boundary.{% endif %}</p></details>
+    <details><summary>Which images work best?</summary><p>Clear axial brain MRI slices in JPG or PNG, similar to the public Kaggle dataset it was trained on. CT scans, photos, screenshots with text, or other body parts will give meaningless results.</p></details>
+    <details><summary>Where are my images stored?</summary><p>On the server running this app, in a private folder. They are only shown to the logged-in account that uploaded them, and you can delete any scan &mdash; or all of them from the Account page &mdash; at any time.</p></details>
+    <details><summary>How was the model trained?</summary><p>On {{ m.total }} labelled MRI images from a public dataset, then checked on {{ m.n }} unseen images. A limited dataset restricts how well it generalises &mdash; see About.</p></details>
+  </div>
+</section>
+{% endblock %}
